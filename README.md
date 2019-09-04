@@ -1,0 +1,2 @@
+# SHkubedemo
+Deploying to AKS
