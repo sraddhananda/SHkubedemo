@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapp1
+spec:
+  selector:
+    matchLabels:
+      app: webapp1
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: webapp1
+        tier: frontend
+    spec:
+      containers:
+      - name: webapp1
+        image: sraddhananda/webapp
+        resources:
+          limits:
+          #Resource Limits. It is good practice to define resource quota at Name space level rather than here.
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80
+        env:
+        - name: DatabaseServer
+          value: mssql
+        - name: DatabaseName
+          value: mydb
+        - name: DatabaseUser
+          value: sa
+        - name: DatabaseUserPassword
+          valueFrom:
+            secretKeyRef:
+              name: mssql
+              key: SA_PASSWORD
+
+---
+
+apiVersion: v1
+kind: Service
+apiVersion: v1
+metadata:
+  name:  webapp1
+spec:
+  selector:
+    app: webapp1
+    tier: frontend
+  type:  LoadBalancer #To expose
+  ports:
+  - name:  http
+    port:  80
+    targetPort:  8080
